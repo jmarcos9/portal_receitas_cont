@@ -19,4 +19,15 @@ def receita(request, receita_id):
 
 
 def buscar(request):
-    return render(request, 'buscar.html')
+    lista_receitas = Receita.objects.order_by('-data_receita').filter(publicada=True)
+
+    if 'buscar' in request.GET:
+        nome_a_buscar = request.GET['buscar']#faz ref ao name do form
+        if buscar:
+            lista_receitas = lista_receitas.filter(nome_receita__icontains=nome_a_buscar)
+    #variavel para passar o conteudo para ser renderizado
+    dados = {
+        'receitas': lista_receitas
+    }
+
+    return render(request, 'buscar.html', dados)

@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 
 def cadastro(request):
+
     if request.method == 'POST':
         nome = request.POST['nome']
         email = request.POST['email']
@@ -34,11 +35,20 @@ def cadastro(request):
 
 
 def login(request):
+    if request.method =='POST':
+        email = request.POST['email']
+        senha = request.POST['senha']
+
+        if email == "" or senha =="":
+            print('email e senha não podem icar em branco')
+            return redirect('login')
+
+        return redirect('dashboard')
     return render(request, 'usuarios/login.html')
 
 
 def dashboard(request):
-    pass
+    return render(request, 'usuarios/dashboard.html')
 
 
 def logout(request):

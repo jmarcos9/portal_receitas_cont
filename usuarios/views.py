@@ -5,29 +5,32 @@ from receitas.models import Receita
 
 
 def cadastro(request):
-
     if request.method == 'POST':
         nome = request.POST['nome']
         email = request.POST['email']
         senha = request.POST['password']
         senha2 = request.POST['password2']
-        print(nome, email, senha, senha2)
 
-        if not nome.strip():
+        if campo_vazio(nome):
             messages.error(request, 'Nome não pode ficar em branco')
             return redirect('cadastro')
 
-        if not email.strip():
+        if campo_vazio(email):
             messages.error(request, 'Email não pode ficar em branco')
             return redirect('cadastro')
 
-        if senha != senha2:
+        if senhas_diferentes(senha, senha2):
             messages.error(request, 'As senhas não são iguais!')
             return redirect('cadastro')
 
         if User.objects.filter(email=email).exists():
             messages.error(request, 'Email já cadastrado!')
             return redirect('cadastro')
+
+        if User.objects.filter(username=nome).exists():
+            messages.error(request, 'Nome já cadastrato, favor abreviar segundo nome ou sobrenome!')
+            return redirect('cadastro')
+
         #atribui nome, email e senha a user
         user = User.objects.create_user(username=nome, email=email, password=senha)
         # salva no bd
@@ -43,9 +46,10 @@ def login(request):
         email = request.POST['email']
         senha = request.POST['senha']
 
-        if email == "" or senha == "":
+        if campo_vazio(email) or campo_vazio(senha):
             messages.error(request, 'Email ou Senha não informado(s)!')
             return redirect('login')
+
         #Atribui email a variavel nome para poder fazer login... django autentica com username
         if User.objects.filter(email=email).exists():
             nome = User.objects.filter(email=email).values_list('username', flat=True).get()
@@ -106,3 +110,10 @@ def cria_receita(request):
         return redirect('dashboard')
     else:
         return render(request, 'usuarios/cria_receita.html')
+
+
+def campo_vazio(campo):
+    return not campo.strip()
+
+def senhas_diferentes(senha, senha2):
+    return senha != senha2

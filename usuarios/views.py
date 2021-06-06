@@ -14,26 +14,24 @@ def cadastro(request):
         print(nome, email, senha, senha2)
 
         if not nome.strip():
-            print('nome em branco')
+            messages.error(request, 'Nome não pode ficar em branco')
             return redirect('cadastro')
 
         if not email.strip():
-            print('email em branco')
+            messages.error(request, 'Email não pode ficar em branco')
             return redirect('cadastro')
 
         if senha != senha2:
             messages.error(request, 'As senhas não são iguais!')
-            print('senha direntes')
             return redirect('cadastro')
 
         if User.objects.filter(email=email).exists():
-            print('usuario já cadastrado')
+            messages.error(request, 'Email já cadastrado!')
             return redirect('cadastro')
         #atribui nome, email e senha a user
         user = User.objects.create_user(username=nome, email=email, password=senha)
         # salva no bd
         user.save()
-        print('usuaeio cadastrado com sucesso')
         messages.success(request, 'Cadastro efetuado com sucesso!')
         return redirect('login')
     else:
@@ -46,7 +44,7 @@ def login(request):
         senha = request.POST['senha']
 
         if email == "" or senha == "":
-            print('email e senha não podem ficar em branco')
+            messages.error(request, 'Email ou Senha não informado(s)!')
             return redirect('login')
         #Atribui email a variavel nome para poder fazer login... django autentica com username
         if User.objects.filter(email=email).exists():
@@ -55,7 +53,6 @@ def login(request):
             #faz o login no bd
             if user is not None:
                 auth.login(request, user)
-                print('login realizdo')
                 return redirect('dashboard')
     return render(request, 'usuarios/login.html')
 
